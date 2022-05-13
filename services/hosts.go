@@ -1,29 +1,27 @@
 package services
 
 import (
+	"host-monitoring/models"
 	"net/http"
 )
 
-type Host struct {
-	URL string
-}
-
-func MonitorHosts(hosts []Host) {
+func MonitorHosts(hosts []models.Host) {
 
 	for _, host := range hosts {
-		status, message := verifyHost(host)
+		status, message := verifyHost(host.URL)
+
 		if !status {
 			sendNotification(message)
 		}
 	}
 }
 
-func verifyHost(host Host) (bool, string) {
-	res, _ := http.Get(host.URL)
+func verifyHost(host string) (bool, string) {
+	res, _ := http.Get(host)
 
 	if res.StatusCode == 200 {
-		return true, "host: " + host.URL + " page ok"
+		return true, "host: " + host + " page ok"
 	}
+	return false, "host: " + host + " page down"
 
-	return false, "host: " + host.URL + " page down"
 }
